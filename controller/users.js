@@ -1,5 +1,12 @@
 const jwt = require('jsonwebtoken')
-let Users=require('../model/users')
+let Users = require('../model/users')
+/**
+ * 
+ * passport.authenticate('local', {
+    successRedirect: '/app',
+    failureRedirect: '/'
+  })
+ */
 const login = async ctx => {
     let { username, pwd } = ctx.request.body
     await Users.findOne({ username, pwd }).then(rel => {
@@ -48,28 +55,33 @@ const register = async ctx => {
         }
     })
     if (!isDouble) {
-        Users.create({ username, pwd }).then(rel => {
+        await Users.create({ username, pwd }).then(rel => {
             if (rel) {
                 ctx.body = {
                     code: 200,
                     msg:'注册成功',
-                    token
+                
                 }
+         
             } else {
                 ctx.body = {
                     code: 300,
                     msg: '注册失败',
                     
                 }
+          
             }
          
             
         }).catch(err => {
-            ctx.body = {
-                code: 500,
-                msg: '注册时出现异常',
-                err
+            if (err) {
+                ctx.body = {
+                    code: 500,
+                    msg: '注册时出现异常',
+                    err
+                }
             }
+        
         })
     }
 }
